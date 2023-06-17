@@ -23,8 +23,15 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Cargar configuraciones de rutas
+const UserRoutes = require("./routes/user");
+const ArtistRoutes = require("./routes/artist");
+const AlbumRoutes = require("./routes/album");
+const SongRoutes = require("./routes/song")
 
-// Ruta de prueba
+app.use("/api/user", UserRoutes);
+app.use("/api/artist", ArtistRoutes);
+app.use("/api/album", AlbumRoutes);
+app.use("/api/song", SongRoutes);
 
 // Poner el servidor a escuchar peticiones http
 app.listen(port, () => {
