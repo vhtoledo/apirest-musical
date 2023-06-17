@@ -1,5 +1,6 @@
 // Importar mongoose
 const mongoose = require("mongoose");
+mongoose.set("strictQuery", true);
 
 // Metodo de conexion
 const connection = async() => {
