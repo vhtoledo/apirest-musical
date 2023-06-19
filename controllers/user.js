@@ -2,17 +2,10 @@
 const bcrypt = require("bcrypt");
 const validate = require("../herpers/validate");
 const User = require("../models/user");
+const jwt = require("../herpers/jwt");
 
-// accion de prueba
-const prueba = (req, res) => {
 
-    return res.status(200).send({
-        status: "success",
-        message: "Mensaje enviado desde: controllers/user.js"
-    });
-}
-
-// Registro
+// Metodo Registro
 const register = async (req, res) => {
 
     // Recoger datos de la peticion
@@ -90,9 +83,90 @@ const register = async (req, res) => {
     }
 }
 
+// Metodo login
+const login = (req, res) => {
+
+    // Recoger parametros body
+    let params = req.body
+
+    if (!params.email || !params.password){
+        return res.status(400).send({
+            status: "error",
+            message: "Faltan datos por enviar"
+        })
+    }
+
+    // Buscar el base de datos si existe
+    User.findOne({email: params.email})
+        .select("+password +role")
+        .then((user) => {
+            // si no existe el usuario
+            if(!user){
+                return res.status(404).send({
+                    status: "error",
+                    message: "No se ha encontrado el usuario",
+                });
+            }
+
+            // Comprobar contraseña
+            const pwd = bcrypt.compareSync(params.password, user.password);
+
+            if(!pwd){
+                return res.status(400).send({
+                    status: "error",
+                    message: "No te has identificado correctamente"
+                });
+            }
+
+            // Limpiar objetos
+            let identityUser = user.toObject();
+            delete identityUser.password;
+            delete identityUser.role;
+
+            // Conseguir Token
+            const token = jwt.createToken(user);
+
+            // Devolver Datos del Usuario
+            return res.status(200).json({
+                status: "success",
+                mensaje: "Identificado correctamente",
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    nick: user.nick
+                },
+                token
+              });
+        });
+}
+
+const profile = (req, res) => {
+    // Recibir el paramtro del id de usuario por la url
+    const id = req.params.id;
+
+    // Consulta para sacar los datos del usuario
+    User.findById(id)
+        .select({password: 0, role: 0})
+        .then(async(userProfile) => {
+            if(!userProfile){
+                return res.status(404).send({
+                    status: "error",
+                    message: "El usuario no existe o hay un error"
+                })
+            }
+
+            // Devolver el restulado 
+            return res.status(200).json({
+                status: "success",
+                user: userProfile,
+            });
+        });
+}
+
 
 // exportar acciones
 module.exports = {
-    prueba,
-    register
+    register,
+    login,
+    profile
 }
