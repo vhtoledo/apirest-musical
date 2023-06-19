@@ -1,3 +1,6 @@
+// Importaciones 
+const Artist = require("../models/artist");
+
 // accion de prueba
 const prueba = (req, res) => {
 
