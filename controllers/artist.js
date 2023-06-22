@@ -81,9 +81,35 @@ const list = (req, res) => {
           });
 }
 
+// Metodo actualizar artista
+const update = (req, res) => {
+
+    // Recoger id artista url
+    const id = req.params.id;
+
+    // Recoger datos body
+    const data = req.body;
+
+    // Buscar y actualizar artista
+    Artist.findByIdAndUpdate(id, data, {new:true})
+          .then((artistUpdate) => {
+            if(!artistUpdate){
+                return res.status(500).send({
+                    status: "error",
+                    message: "No se ha actualizado el artista",
+                });
+            }
+            return res.status(200).send({
+                status: "error",
+                artist: artistUpdate
+            });
+          });
+}
+
 // exportar acciones
 module.exports = {
     save,
     one,
-    list
+    list,
+    update
 }
