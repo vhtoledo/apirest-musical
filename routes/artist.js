@@ -1,5 +1,6 @@
 // Importar dependecias 
 const express = require("express");
+const check = require("../middlewares/auth");
 
 // Cargar Router
 const router = express.Router();
@@ -8,7 +9,7 @@ const router = express.Router();
 const ArtistController = require("../controllers/artist");
 
 // Definir rutas
-router.get("/prueba-artist", ArtistController.prueba)
+router.post("/save", check.auth, ArtistController.save);
 
 // Exportar router
 module.exports = router;
