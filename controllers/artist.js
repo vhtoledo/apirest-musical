@@ -106,10 +106,39 @@ const update = (req, res) => {
           });
 }
 
+// Metodo borrar artista 
+const remove = async(req, res) => {
+
+    // Sacar el id del artista de la url
+    const artistId = req.params.id;
+
+    // Hacer consulta para buscar y eliminar el artista con un await 
+    try {
+        const artistRemoved = await Artist.findByIdAndDelete(artistId);
+
+        // Remove de albums
+        // Remove de songs
+
+        // devolver resultado
+        return res.status(200).send({
+            status: "error",
+            artistRemoved
+        });
+        
+    } catch (error) {
+        return res.status(500).send({
+            status: "error",
+            message: "Error al eliminar el artista",
+            error
+        });
+    }
+}
+
 // exportar acciones
 module.exports = {
     save,
     one,
     list,
-    update
+    update,
+    remove
 }
