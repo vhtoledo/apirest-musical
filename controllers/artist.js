@@ -24,10 +24,32 @@ const save = (req, res) => {
                 artist: artistStored
             });
           })
+}
+
+// Metodo obtener un artista 
+const one = (req, res) => {
+    // Sacar un parametro por url
+    const artistId = req.params.id;
+
+    // Find 
+    Artist.findById(artistId)
+          .then((artist) => {
+            if(!artist) {
+                return res.status(404).send({
+                    status: "error",
+                    message: "No existe el artista",
+                });
+            }
+            return res.status(200).send({
+                status: "success",
+                artist
+            });
+          })
 
 }
 
 // exportar acciones
 module.exports = {
-    save
+    save,
+    one
 }
