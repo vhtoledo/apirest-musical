@@ -1,5 +1,7 @@
 // Importaciones
 const Song = require("../models/song");
+const fs = require("fs");
+const path = require("path");
 
 // Metodo guardar
 const save = (req, res) => {
@@ -123,11 +125,89 @@ const remove = (req, res) => {
         })
 }
 
+// metodo subir imagen
+const upload = (req, res) => {
+
+    // Recoger artist id
+    let songId = req.params.id;
+
+    // Recoger el fichero de imagen y comprobar que existe
+    if(!req.file){
+        return res.status(404).send({
+            status: "error",
+            message: "Petición no incluye la cancion"
+        });
+    }
+
+    // Conseguir el nombre del archivo
+    let image = req.file.originalname;
+
+    // Sacar la extension del archivo
+    const imageSplit = image.split("\.");
+    const extension = imageSplit[1];
+    
+    // Comprobar extension
+    if(extension != "mp3" && extension != "ogg"){
+
+        // Borrar archivo subido
+        const filePath = req.file.path;
+        const fileDeleted = fs.unlinkSync(filePath);
+        // Devolver respuesta negativa
+        return res.status(400).send({
+            status: "error",
+            message: "Extensión del fichero inválida"
+        });
+    }
+
+    // Si es correcta, guardar imagen en base de datos
+    Song.findOneAndUpdate({_id: songId}, {file: req.file.filename}, {new:true})
+        .then((songUpdated) => {
+            if(!songUpdated) {
+                return res.status(500).send({
+                    status: "error",
+                    message: "Error en la subida de la cancion"
+                });
+            }
+
+            return res.status(200).send({
+                status:"success",
+                song: songUpdated,
+                file: req.file,
+            });
+        });
+}
+
+// Metodo mostrar audio
+const audio = (req, res) => {
+
+    // Sacar el parametro de la url
+    const file = req.params.file;
+
+    // Montar el path real de la imagen
+    const filePath = "./uploads/songs/"+file;
+
+    // Comprobar que existe
+    fs.stat(filePath, (error, exists) => {
+
+        if(!exists){
+            return res.status(404).send({
+                status: "error", 
+                message: "No existe la cancion"
+            });
+        } 
+        
+        // Devolver un file
+        return res.sendFile(path.resolve(filePath));
+    });
+}
+
 // exportar acciones
 module.exports = {
     save,
     one,
     list,
     update,
-    remove
+    remove,
+    upload,
+    audio
 }

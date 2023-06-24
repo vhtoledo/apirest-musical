@@ -155,7 +155,7 @@ const upload = (req, res) => {
         });
 }
 
-// Metodo mostrar avatar
+// Metodo mostrar imagen
 const image = (req, res) => {
 
     // Sacar el parametro de la url
