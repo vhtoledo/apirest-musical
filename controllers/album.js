@@ -177,7 +177,6 @@ const image = (req, res) => {
         // Devolver un file
         return res.sendFile(path.resolve(filePath));
     });
-
 }
 
 // exportar acciones
