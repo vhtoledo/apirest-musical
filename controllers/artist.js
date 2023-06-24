@@ -1,5 +1,7 @@
 // Importaciones 
 const Artist = require("../models/artist");
+const Album = require("../models/album");
+const Song = require("../models/song");
 const mongoosePagitacion = require("mongoose-pagination");
 const fs = require("fs");
 const path = require("path");
@@ -117,14 +119,17 @@ const remove = async(req, res) => {
     // Hacer consulta para buscar y eliminar el artista con un await 
     try {
         const artistRemoved = await Artist.findByIdAndDelete(artistId);
-
         // Remove de albums
+        const albumRemoved = await Album.find({artist: artistId}).remove();
         // Remove de songs
+        const songRemoved = await Song.find({album: albumRemoved._id}).remove();
 
         // devolver resultado
         return res.status(200).send({
             status: "error",
-            artistRemoved
+            artistRemoved,
+            albumRemoved,
+            songRemoved
         });
         
     } catch (error) {
