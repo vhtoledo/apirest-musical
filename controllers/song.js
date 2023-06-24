@@ -101,10 +101,33 @@ const update = (req, res) => {
          });
 }
 
+// Metodo para eliminar cancion
+const remove = (req, res) => {
+    
+    // Recoger param url
+    const songId = req.params.id;
+
+    // Remover
+    Song.findByIdAndRemove(songId)
+        .then((songRemove) => {
+            if(!songRemove){
+                return res.status(500).send({
+                    status: "error",
+                    message: "No se ha podido eliminar la cancion",
+                });
+            }
+            return res.status(200).send({
+                status: "success",
+                song: songRemove
+            });
+        })
+}
+
 // exportar acciones
 module.exports = {
     save,
     one,
     list,
-    update
+    update,
+    remove
 }
