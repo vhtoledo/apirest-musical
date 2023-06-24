@@ -45,12 +45,40 @@ const one = (req, res) => {
                 status: "success",
                 album
             });
-          })
+          });
+}
 
+// Metodo para sacar una lista de albums
+const list = (req, res) => {
+    // Sacar el id del artista de la url
+    const artistId = req.params.artistId;
+
+    // Sacar todo los albums de la base de datos de un artista en concreto
+    if(!artistId){
+        return res.status(404).send({
+            status: "error",
+            message: "No se ha encontrado el artista"
+        });
+    }
+
+    Album.find({artist: artistId}).populate("artist")
+         .then((albums) => {
+            if(!albums) {
+                return res.status(500).send({
+                    status: "error",
+                    message: "No se ha encontrado albums",
+                });
+            }
+            return res.status(200).send({
+                status: "success",
+                albums
+            });
+          });
 }
 
 // exportar acciones
 module.exports = {
     save,
-    one
+    one,
+    list
 }
