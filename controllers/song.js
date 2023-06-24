@@ -76,9 +76,35 @@ const list = (req, res) => {
           });
 }
 
+// Metodo para actualizar una cancion
+const update = (req, res) => {
+
+    // Recoger param url
+    const songId = req.params.songId;
+
+    // Recoger el body
+    const data = req.body;
+
+    // Find y un update
+    Song.findByIdAndUpdate(songId, data, {new:true})
+        .then((songUpdated) => {
+            if(!songUpdated){
+                return res.status(500).send({
+                    status: "error",
+                    message: "No se ha actualizado la cancion",
+                });
+            }
+            return res.status(200).send({
+                status: "success",
+                song: songUpdated
+            });
+         });
+}
+
 // exportar acciones
 module.exports = {
     save,
     one,
-    list
+    list,
+    update
 }
