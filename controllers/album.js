@@ -1,5 +1,6 @@
 // Importaciones
 const Album = require("../models/album");
+const Song = require("../models/song");
 const fs = require("fs");
 const path = require("path");
 
@@ -179,6 +180,35 @@ const image = (req, res) => {
     });
 }
 
+// Metodo borrar artista 
+const remove = async(req, res) => {
+
+    // Sacar el id del artista de la url
+    const albumId = req.params.id;
+
+    // Hacer consulta para buscar y eliminar el artista con un await 
+    try {
+        const albumRemoved = await Album.findById(albumId).remove();
+        const songsRemoved = await Song.find({album: albumId}).remove();
+
+
+        // devolver resultado
+        return res.status(200).send({
+            status: "sucess",
+            message: "metodo borrado albums",
+            albumRemoved,
+            songsRemoved
+        });
+        
+    } catch (error) {
+        return res.status(500).send({
+            status: "error",
+            message: "Error al eliminar albums",
+            error
+        });
+    }
+}
+
 // exportar acciones
 module.exports = {
     save,
@@ -186,5 +216,6 @@ module.exports = {
     list,
     update,
     upload,
-    image
+    image,
+    remove
 }

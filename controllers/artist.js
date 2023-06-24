@@ -119,17 +119,21 @@ const remove = async(req, res) => {
     // Hacer consulta para buscar y eliminar el artista con un await 
     try {
         const artistRemoved = await Artist.findByIdAndDelete(artistId);
-        // Remove de albums
-        const albumRemoved = await Album.find({artist: artistId}).remove();
+        const albumRemoved = await Album.find({artist: artistId});
+
+        albumRemoved.forEach(async(album) => {
+            const songRemoved = await Song.find({album: albumRemoved._id}).remove();
+
+            album.remove()
+        });
         // Remove de songs
-        const songRemoved = await Song.find({album: albumRemoved._id}).remove();
+        // const songRemoved = await Song.find({album: albumRemoved._id}).remove();
 
         // devolver resultado
         return res.status(200).send({
-            status: "error",
-            artistRemoved,
-            albumRemoved,
-            songRemoved
+            status: "sucess",
+            message: "metodo borrado artista",
+            artistRemoved
         });
         
     } catch (error) {
